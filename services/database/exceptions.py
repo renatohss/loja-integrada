@@ -1,0 +1,2 @@
+class DatabaseSaveException(Exception):
+    pass

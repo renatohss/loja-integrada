@@ -1,0 +1,2 @@
+class ItemAlreadyOnCartException(Exception):
+    pass

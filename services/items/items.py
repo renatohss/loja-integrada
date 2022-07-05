@@ -10,5 +10,5 @@ class ItemManager:
     def get_item(self, sku: str):
         try:
             return self.items_api[sku]
-        except TypeError:
+        except KeyError:
             raise ItemNotFoundException()

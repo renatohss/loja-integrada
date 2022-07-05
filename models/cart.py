@@ -4,6 +4,8 @@ from typing import List, Dict, Any
 
 from pydantic import BaseModel
 
+from services.items.exceptions import ItemNotFoundException
+
 
 class Status(str, Enum):
     OPEN = "open"
@@ -71,12 +73,25 @@ class Cart:
             "total_price": self.total_price
         }
 
+    def calculate_total_price(self):
+        total = 0
+        for item in self.items:
+            total += item.total_price
+        self.total_price = total
+
     def add_item(self, item: Item):
         items = list(self.items)
         items.append(item)
         self.items = items
 
-    def get_item(self, sku: str):
+    def edit_item(self, sku: str, quantity: int):
+        sku_found = False
         for item in self.items:
             if item.sku == sku:
-                return item
+                item.quantity = quantity
+                item.total_price = quantity * item.price
+                sku_found = True
+        self.calculate_total_price()
+        if not sku_found:
+            raise ItemNotFoundException()
+

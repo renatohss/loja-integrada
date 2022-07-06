@@ -25,7 +25,7 @@ class Item:
     name: str
     price: float
     quantity: int
-    total_price: float
+    total_price: float = 0.0
 
     @classmethod
     def from_json(cls, raw: Dict[str, Any]) -> "Item":
@@ -63,6 +63,8 @@ class Cart:
             id=raw["id"],
             status=raw["status"],
             items=items,
+            discount=raw["discount"],
+            original_price=raw["original_price"],
             total_price=raw["total_price"]
         )
 
@@ -72,6 +74,8 @@ class Cart:
             "id": self.id,
             "status": self.status,
             "items": items,
+            "discount": self.discount,
+            "original_price": self.original_price,
             "total_price": self.total_price
         }
 
@@ -84,6 +88,7 @@ class Cart:
 
     def add_item(self, item: Item):
         self.items.append(item)
+        self.calculate_total_price()
 
     def edit_item(self, sku: str, quantity: int):
         sku_found = False

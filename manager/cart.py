@@ -44,10 +44,8 @@ class CartManager:
             price=item_data["price"],
             quantity=quantity,
             total_price=item_data["price"] * quantity
-
         )
         cart.add_item(item)
-        cart.calculate_total_price()
         self.db.save(data=cart.to_json())
         return cart
 

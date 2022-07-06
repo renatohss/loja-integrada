@@ -1,14 +1,17 @@
 import json
-from typing import Dict
 
 from services.items.exceptions import ItemNotFoundException
 
 
 class ItemManager:
-    items_api: Dict = json.load(open("items.json"))
+
+    @staticmethod
+    def get_api():
+        return json.load(open("items.json"))
 
     def get_item(self, sku: str):
+        items_api = self.get_api()
         try:
-            return self.items_api[sku]
+            return items_api[sku]
         except KeyError:
             raise ItemNotFoundException()

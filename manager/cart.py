@@ -18,7 +18,7 @@ class CartManager:
             id=cart_id,
             status=Status.OPEN,
         )
-        self.db.save(data=cart.to_json())
+        self.db.save(key=cart.id, data=cart.to_json())
         return cart
 
     def get_cart(self, cart_id: str) -> Cart:
@@ -46,7 +46,7 @@ class CartManager:
             total_price=item_data["price"] * quantity
         )
         cart.add_item(item)
-        self.db.save(data=cart.to_json())
+        self.db.save(key=cart.id, data=cart.to_json())
         return cart
 
     def edit_item(self, cart_id: str, sku: str, quantity: int) -> Cart:
@@ -54,18 +54,19 @@ class CartManager:
             raise ManagerInvalidItemQuantityException()
         cart = self.get_cart(cart_id=cart_id)
         cart.edit_item(sku=sku, quantity=quantity)
-        self.db.save(data=cart.to_json())
+        self.db.save(key=cart.id, data=cart.to_json())
         return cart
 
     def remove_item(self, cart_id: str, sku: str) -> Cart:
         cart = self.get_cart(cart_id=cart_id)
         cart.remove_item(sku=sku)
-        self.db.save(data=cart.to_json())
+        self.db.save(key=cart.id, data=cart.to_json())
         return cart
 
     def clear_cart_items(self, cart_id: str) -> Cart:
         cart = self.get_cart(cart_id=cart_id)
         cart.clear_items()
+        self.db.save(key=cart.id, data=cart.to_json())
         return cart
 
     def set_discount(self, cart_id: str, discount: float):
@@ -73,5 +74,5 @@ class CartManager:
             raise ManagerInvalidDiscountValueException()
         cart = self.get_cart(cart_id=cart_id)
         cart.set_discount(discount=discount)
-        self.db.save(data=cart.to_json())
+        self.db.save(key=cart.id, data=cart.to_json())
         return cart

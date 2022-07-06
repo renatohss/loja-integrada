@@ -1,10 +1,12 @@
 from fastapi import FastAPI, Depends
 
-from api.exceptions import ApiItemAlreadyOnCartException, ApiItemNotFoundException, ApiCartNotFoundException
+from api.exceptions import ApiItemAlreadyOnCartException, ApiItemNotFoundException, ApiCartNotFoundException, \
+    ApiInvalidItemQuantityException
 from manager.cart import CartManager
 from manager.exceptions import ManagerItemAlreadyOnCartException, ManagerItemNotFoundException, \
-    ManagerCartNotFoundException
+    ManagerCartNotFoundException, ManagerInvalidItemQuantityException
 from models.cart import AddItemRequest
+from services.items.exceptions import ItemNotFoundException
 
 app = FastAPI()
 
@@ -32,23 +34,43 @@ def add_item(add_item_request: AddItemRequest, manager: CartManager = Depends(Ca
         )
     except ManagerItemAlreadyOnCartException:
         return ApiItemAlreadyOnCartException()
-    except ManagerItemNotFoundException:
+    except ItemNotFoundException:
         return ApiItemNotFoundException()
+    except ManagerInvalidItemQuantityException:
+        return ApiInvalidItemQuantityException()
 
 
 @app.put("/cart/{cart_id}/items/{item_sku}/{quantity}")
 def edit_item(cart_id: str, sku: str, quantity: int, manager: CartManager = Depends(CartManager)):
     try:
         return manager.edit_item(cart_id=cart_id, sku=sku, quantity=quantity)
-    except ManagerItemNotFoundException:
+    except ItemNotFoundException:
         return ApiItemNotFoundException()
+    except ManagerInvalidItemQuantityException:
+        return ApiInvalidItemQuantityException()
 
 
 @app.delete("/cart/{cart_id}/items/{item_sku}")
-def remove_item(cart_id: str, sku: str):
-    return "cart_with_items_updated"
+def remove_item(cart_id: str, sku: str, manager: CartManager = Depends(CartManager)):
+    try:
+        return manager.remove_item(cart_id=cart_id, sku=sku)
+    except ItemNotFoundException:
+        return ApiItemNotFoundException()
+    except ManagerCartNotFoundException:
+        return ApiCartNotFoundException()
 
 
-@app.delete("/cart/{cart_id}/clear")
-def clear_cart(cart_id: str):
-    return "cart_with_no_items"
+@app.delete("/cart/{cart_id}/clear_items")
+def clear_cart(cart_id: str, manager: CartManager = Depends(CartManager)):
+    try:
+        return manager.clear_cart_items(cart_id=cart_id)
+    except ManagerCartNotFoundException:
+        return ApiCartNotFoundException()
+
+
+@app.patch("/cart/{cart_id}/add_discount")
+def add_discount(cart_id: str, discount: float, manager: CartManager = Depends(CartManager)):
+    try:
+        return manager.add_discount(cart_id=cart_id, discount=discount)
+    except ManagerCartNotFoundException:
+        return ApiCartNotFoundException()

@@ -52,6 +52,8 @@ class Cart:
     id: str
     status: Status
     items: List[Item] = field(default_factory=list)
+    discount: float = 0.0
+    original_price: float = 0.0
     total_price: float = 0.0
 
     @classmethod
@@ -77,12 +79,11 @@ class Cart:
         total = 0
         for item in self.items:
             total += item.total_price
-        self.total_price = total
+        self.original_price = total
+        self.total_price = total - self.discount
 
     def add_item(self, item: Item):
-        items = list(self.items)
-        items.append(item)
-        self.items = items
+        self.items.append(item)
 
     def edit_item(self, sku: str, quantity: int):
         sku_found = False
@@ -95,3 +96,20 @@ class Cart:
         if not sku_found:
             raise ItemNotFoundException()
 
+    def remove_item(self, sku: str):
+        sku_found = False
+        for item in self.items:
+            if item.sku == sku:
+                self.items.pop(self.items.index(item))
+                sku_found = True
+        self.calculate_total_price()
+        if not sku_found:
+            raise ItemNotFoundException()
+
+    def clear_items(self):
+        self.items = []
+        self.calculate_total_price()
+
+    def add_discount(self, discount: float):
+        self.discount = discount
+        self.calculate_total_price()

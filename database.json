@@ -1,1 +1,1 @@
-{"56ad456a-fcac-11ec-9823-8bd7666e10b9": {"id": "56ad456a-fcac-11ec-9823-8bd7666e10b9", "status": "open", "items": [{"sku": "2", "name": "Produto 2", "price": 32.0, "quantity": 11, "total_price": 352.0}, {"sku": "3", "name": "Produto 3", "price": 5.75, "quantity": 1, "total_price": 5.75}], "total_price": 357.75}}
+{"56ad456a-fcac-11ec-9823-8bd7666e10b9": {"id": "56ad456a-fcac-11ec-9823-8bd7666e10b9", "status": "open", "items": [{"sku": "2", "name": "Produto 2", "price": 32.0, "quantity": 10, "total_price": 320.0}], "total_price": 270.0}}

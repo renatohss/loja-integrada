@@ -1,7 +1,7 @@
 from uuid import uuid1
 
 from manager.exceptions import ManagerItemAlreadyOnCartException, ManagerItemNotFoundException, \
-    ManagerCartNotFoundException
+    ManagerCartNotFoundException, ManagerInvalidItemQuantityException, ManagerInvalidDiscountValueException
 from models.cart import Cart, Status, Item
 from services.database.database import Database
 from services.items.exceptions import ItemNotFoundException
@@ -9,24 +9,27 @@ from services.items.items import ItemManager
 
 
 class CartManager:
-    @staticmethod
-    def create_cart() -> Cart:
+
+    db = Database()
+
+    def create_cart(self) -> Cart:
         cart_id = str(uuid1())
         cart = Cart(
             id=cart_id,
             status=Status.OPEN,
         )
-        Database().save(data=cart.to_json())
+        self.db.save(data=cart.to_json())
         return cart
 
-    @staticmethod
-    def get_cart(cart_id: str) -> Cart:
-        cart = Database().get(key=cart_id)
+    def get_cart(self, cart_id: str) -> Cart:
+        cart = self.db.get(key=cart_id)
         if not cart:
             raise ManagerCartNotFoundException()
         return Cart.from_json(cart)
 
-    def add_item(self, cart_id: str, sku: str, quantity: int):
+    def add_item(self, cart_id: str, sku: str, quantity: int) -> Cart:
+        if quantity < 1:
+            raise ManagerInvalidItemQuantityException()
         cart = self.get_cart(cart_id=cart_id)
         for item in cart.items:
             if item.sku == sku:
@@ -45,14 +48,35 @@ class CartManager:
         )
         cart.add_item(item)
         cart.calculate_total_price()
-        Database().save(data=cart.to_json())
+        self.db.save(data=cart.to_json())
         return cart
 
-    def edit_item(self, cart_id: str, sku: str, quantity: int):
+    def edit_item(self, cart_id: str, sku: str, quantity: int) -> Cart:
+        if quantity < 1:
+            raise ManagerInvalidItemQuantityException()
         cart = self.get_cart(cart_id=cart_id)
         try:
             cart.edit_item(sku=sku, quantity=quantity)
-            Database().save(data=cart.to_json())
+            self.db.save(data=cart.to_json())
+            return cart
         except ItemNotFoundException:
             raise ManagerItemNotFoundException()
+
+    def remove_item(self, cart_id: str, sku: str) -> Cart:
+        cart = self.get_cart(cart_id=cart_id)
+        cart.remove_item(sku=sku)
+        self.db.save(data=cart.to_json())
+        return cart
+
+    def clear_cart_items(self, cart_id: str) -> Cart:
+        cart = self.get_cart(cart_id=cart_id)
+        cart.clear_items()
+        return cart
+
+    def add_discount(self, cart_id: str, discount: float):
+        cart = self.get_cart(cart_id=cart_id)
+        if discount <= 0.0:
+            raise ManagerInvalidDiscountValueException()
+        cart.add_discount(discount=discount)
+        self.db.save(data=cart.to_json())
         return cart

@@ -68,9 +68,9 @@ def clear_cart(cart_id: str, manager: CartManager = Depends(CartManager)):
         return ApiCartNotFoundException()
 
 
-@app.patch("/cart/{cart_id}/add_discount")
-def add_discount(cart_id: str, discount: float, manager: CartManager = Depends(CartManager)):
+@app.patch("/cart/{cart_id}/set_discount/{discount}")
+def set_discount(cart_id: str, discount: float, manager: CartManager = Depends(CartManager)):
     try:
-        return manager.add_discount(cart_id=cart_id, discount=discount)
+        return manager.set_discount(cart_id=cart_id, discount=discount)
     except ManagerCartNotFoundException:
         return ApiCartNotFoundException()

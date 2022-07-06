@@ -53,12 +53,9 @@ class CartManager:
         if quantity < 1:
             raise ManagerInvalidItemQuantityException()
         cart = self.get_cart(cart_id=cart_id)
-        try:
-            cart.edit_item(sku=sku, quantity=quantity)
-            self.db.save(data=cart.to_json())
-            return cart
-        except ItemNotFoundException:
-            raise ManagerItemNotFoundException()
+        cart.edit_item(sku=sku, quantity=quantity)
+        self.db.save(data=cart.to_json())
+        return cart
 
     def remove_item(self, cart_id: str, sku: str) -> Cart:
         cart = self.get_cart(cart_id=cart_id)
@@ -71,10 +68,10 @@ class CartManager:
         cart.clear_items()
         return cart
 
-    def add_discount(self, cart_id: str, discount: float):
-        cart = self.get_cart(cart_id=cart_id)
-        if discount <= 0.0:
+    def set_discount(self, cart_id: str, discount: float):
+        if discount < 0.0:
             raise ManagerInvalidDiscountValueException()
-        cart.add_discount(discount=discount)
+        cart = self.get_cart(cart_id=cart_id)
+        cart.set_discount(discount=discount)
         self.db.save(data=cart.to_json())
         return cart

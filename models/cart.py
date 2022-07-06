@@ -84,7 +84,7 @@ class Cart:
         for item in self.items:
             total += item.total_price
         self.original_price = total
-        self.total_price = total - self.discount
+        self.total_price = total - self.discount if total > self.discount else 0.0
 
     def add_item(self, item: Item):
         self.items.append(item)
@@ -115,6 +115,6 @@ class Cart:
         self.items = []
         self.calculate_total_price()
 
-    def add_discount(self, discount: float):
+    def set_discount(self, discount: float):
         self.discount = discount
         self.calculate_total_price()

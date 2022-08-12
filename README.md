@@ -4,7 +4,7 @@ Cart API with items management
 ## Configuring and Running the Project
 We use Docker to generate a container with all the requirements needed to run the API.
 Follow these steps to run the project:
- - Install Docker on your machine ([Click here to get Docker](http://localhost:8000/))
+ - Install Docker on your machine ([Click here to get Docker](https://docs.docker.com/get-docker/))
  - Run the command `docker build -t loja-integrada .` to build the image
  - Run the command `docker run -d --name loja-integrada -p 8000:8000 loja-integrada` to start the container
  - Done! You can access the API at [http://localhost:8000/](http://localhost:8000/)
